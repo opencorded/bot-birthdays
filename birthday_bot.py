@@ -314,6 +314,32 @@ def main():
         return "\n".join([f"**Birthdays I know ({len(known)})**"] + (known or ["- none yet"]) +
                          (["", "**No birthday yet:** " + ", ".join(without)] if without else []))
 
+    # Its page in the app (tap it in the members list, Manage): where and when it wishes people.
+    def choose_time(value):
+        nonlocal at
+        chosen = parse_time(str(value))
+        if not chosen:
+            raise ValueError("write a time of day like 08:30")
+        at = bot.store["at"] = chosen
+        bot.store.save()
+
+    def choose_channel(title):
+        nonlocal channel
+        channel = bot.store["channel"] = title
+        bot.store["channel_id"] = bot.room_id(title)
+        bot.store.save()
+
+    def channel_now():
+        follow()
+        return channel
+    bot.version = "1.1"
+    bot.setting("channel", "choice", "Channel for birthday wishes", get=channel_now, set=choose_channel,
+                options=lambda: sorted(r.get("title", "") for r in bot.rooms.values() if r.get("kind") == "channel"))
+    bot.setting("at", "text", "Time of day for the wishes", get=lambda: at, set=choose_time, max=8,
+                help="By the clock of the machine I run on, like 09:00.")
+    bot.info("known", "Birthdays I know", get=lambda: str(sum(1 for p in people.values() if p.get("birthday"))))
+    bot.show_status()
+
     def manage(message):
         """What the owner and those with the Manage bots permission may tell it."""
         nonlocal channel, at
