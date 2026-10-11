@@ -1,0 +1,15 @@
+{
+  "name": "birthdays",
+  "title": "Birthday Bot",
+  "about": "Asks each new member for their birthday and wishes them on the day",
+  "kind": "bot",
+  "needs": {},
+  "start": [
+    "python3",
+    "-u",
+    "birthday_bot.py",
+    "{server}",
+    "--vault",
+    "{vault}"
+  ]
+}
